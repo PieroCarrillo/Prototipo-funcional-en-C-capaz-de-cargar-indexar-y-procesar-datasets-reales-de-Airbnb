@@ -1,0 +1,8 @@
+id,name,host_id,host_name,neighbourhood,room_type,price,minimum_nights,number_of_reviews,reviews_per_month,availability_365,latitude,longitude
+2001,Hostal centrico para mochileros,601,Rosa Quispe,Centro Historico,Shared room,24,1,210,4.5,320,-13.5168,-71.9788
+2002,Departamento colonial cerca a la plaza,602,Victor Huaman,Centro Historico,Entire home/apt,95,2,173,3.1,200,-13.5182,-71.9773
+2003,Casa tranquila en San Blas,603,Elena Paredes,San Blas,Entire home/apt,76,2,118,2.8,240,-13.5147,-71.9741
+2004,Habitacion con vista a montanas,604,Raul Cardenas,San Sebastian,Private room,35,1,47,1.2,280,-13.5300,-71.9380
+2005,Alojamiento familiar para grupos,605,Milagros Flores,Wanchaq,Entire home/apt,120,3,96,1.9,160,-13.5252,-71.9581
+2006,Estudio compacto para teletrabajo,606,Oscar Medina,Wanchaq,Entire home/apt,58,2,66,1.6,190,-13.5240,-71.9567
+

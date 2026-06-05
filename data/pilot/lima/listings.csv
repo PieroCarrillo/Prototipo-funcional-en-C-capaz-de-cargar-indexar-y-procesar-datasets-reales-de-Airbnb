@@ -1,0 +1,8 @@
+id,name,host_id,host_name,neighbourhood,room_type,price,minimum_nights,number_of_reviews,reviews_per_month,availability_365,latitude,longitude
+1001,Departamento luminoso cerca a la playa,501,Ana Ruiz,Miraflores,Entire home/apt,85,2,144,3.2,210,-12.1211,-77.0301
+1002,Habitacion privada en Barranco cultural,502,Carlos Vega,Barranco,Private room,42,1,89,2.1,180,-12.1480,-77.0215
+1003,Loft ejecutivo cerca al centro financiero,503,Lucia Torres,San Isidro,Entire home/apt,110,3,61,1.4,120,-12.0970,-77.0365
+1004,Mini estudio para viajes cortos,504,Marco Silva,Surquillo,Entire home/apt,38,1,37,1.0,260,-12.1142,-77.0148
+1005,Casa familiar con terraza y cocina amplia,505,Paula Rios,Miraflores,Entire home/apt,130,3,102,2.5,150,-12.1198,-77.0282
+1006,Habitacion economica cerca al Metropolitano,506,Diego Leon,Lince,Private room,29,1,55,1.7,300,-12.0845,-77.0352
+
