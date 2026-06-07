@@ -45,6 +45,18 @@ En Windows, el ejecutable puede quedar como `build/airbnb_indexer.exe`.
 
 ## Ejecucion rapida
 
+En Windows, desde VS Code, PowerShell o CMD:
+
+```cmd
+.\run.bat
+```
+
+Ese archivo compila y ejecuta el prototipo usando `C:\msys64\mingw64\bin\g++.exe`.
+
+En VS Code tambien puedes presionar `Ctrl+Shift+B` y elegir `Compilar y ejecutar Airbnb`.
+
+Tambien puedes compilar manualmente:
+
 ```bash
 ./build/airbnb_indexer --data data/pilot --query playa --id 1001 --min-price 40 --max-price 120 --top 5
 ```

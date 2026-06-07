@@ -5,6 +5,6 @@ exports/
 *.o
 *.obj
 *.log
-.vscode/
+.vscode/*
+!.vscode/tasks.json
 .idea/
-
