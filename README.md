@@ -12,6 +12,8 @@ Este repositorio contiene el segundo avance del trabajo final: un prototipo en C
 | Ordenamiento y filtrado | Filtro por rango de precio y ordenamiento por precio, resenas y ranking |
 | Metricas de rendimiento | `src/main.cpp` mide carga, indexacion, busqueda y ordenamiento con `chrono` |
 | Simulacion con colecciones piloto | `data/pilot/` incluye carpetas por ciudad y archivos CSV de prueba |
+| M4 - Busqueda en grafos | `src/GraphAnalytics.cpp` implementa Dijkstra, Bellman-Ford, Floyd-Warshall, Kruskal, Prim, Boruvka, DFS y Tarjan |
+| M5 - Busqueda por rangos | `src/RangeAnalytics.cpp` implementa Segment Tree, Fenwick Tree, busqueda binaria, Segment Tree lazy, Fenwick puntual y AVL |
 
 ## Estructura
 
@@ -124,5 +126,7 @@ El programa imprime:
 - Resultados de busqueda parcial.
 - Resultados filtrados por rango de precio.
 - Rankings ordenados por precio y por puntaje.
+- Resultados M4 de grafos: caminos minimos, MST, DFS y Tarjan.
+- Resultados M5 de rangos: Segment Tree, Fenwick, busqueda binaria y actualizaciones dinamicas de calendario.
 
 El documento del avance esta en `docs/AVANCE_2_GRUPO_03.md` y los resultados preliminares estan en `docs/RESULTADOS_PRELIMINARES.md`.

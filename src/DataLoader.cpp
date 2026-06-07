@@ -93,3 +93,38 @@ std::vector<Listing> DataLoader::loadListings(const std::filesystem::path& root,
 
     return listings;
 }
+
+std::vector<CalendarEntry> DataLoader::loadCalendar(const std::filesystem::path& root, CalendarReport& report) {
+    report = CalendarReport{};
+    report.csvFiles = DirectoryScanner::findCsvFiles(root);
+
+    std::vector<CalendarEntry> entries;
+    for (const CsvFileInfo& fileInfo : report.csvFiles) {
+        if (fileInfo.kind != CsvKind::Calendar) {
+            continue;
+        }
+
+        ++report.calendarFiles;
+        const std::vector<CsvReader::Row> rows = CsvReader::read(fileInfo.path);
+        report.rowsRead += rows.size();
+
+        for (const CsvReader::Row& row : rows) {
+            CalendarEntry entry;
+            entry.listingId = toLongLong(getValue(row, "listing_id"));
+            entry.date = getValue(row, "date");
+            entry.available = getValue(row, "available") == "t" || getValue(row, "available") == "true";
+            entry.price = toDouble(getValue(row, "price"));
+            entry.sourceFile = fileInfo.path.string();
+
+            if (entry.listingId == 0 || entry.date.empty()) {
+                ++report.rowsSkipped;
+                continue;
+            }
+
+            entries.push_back(std::move(entry));
+            ++report.rowsLoaded;
+        }
+    }
+
+    return entries;
+}

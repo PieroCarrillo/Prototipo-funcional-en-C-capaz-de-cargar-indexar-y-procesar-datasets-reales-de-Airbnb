@@ -65,3 +65,30 @@ Resultado esperado:
 
 - Crea un CSV con los alojamientos mejor rankeados.
 - Incluye columnas de ID, nombre, barrio, tipo, precio, resenas, disponibilidad y score.
+
+## CP06 - Modulo M4 de grafos
+
+Comando:
+
+```bash
+./build/airbnb_indexer --data data/pilot
+```
+
+Resultado esperado:
+
+- Muestra Dijkstra, Bellman-Ford y Floyd-Warshall sobre el grafo de listings.
+- Muestra Kruskal, Prim y Boruvka sobre el grafo de barrios.
+- Muestra DFS, nodos/s y Tarjan.
+
+## CP07 - Modulo M5 de rangos
+
+Comando:
+
+```bash
+./build/airbnb_indexer --data data/pilot --min-price 40 --max-price 120
+```
+
+Resultado esperado:
+
+- Segment Tree, Fenwick Tree y busqueda binaria reportan la misma cantidad de coincidencias.
+- La simulacion de calendario dinamico ejecuta Segment Tree lazy, Fenwick puntual y AVL.

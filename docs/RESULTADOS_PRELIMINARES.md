@@ -106,5 +106,30 @@ Primeros 5:
 
 ## Interpretacion
 
-La coleccion piloto confirma que el prototipo cubre operaciones esenciales del segundo avance: localiza archivos en subdirectorios, evita busqueda secuencial para consultas por ID, utiliza indice invertido para texto, filtra por rango de precio con estructura ordenada y genera un ranking inicial mediante cola de prioridad.
+## Resultados M4 - Grafos
 
+La ejecucion actual construye un grafo de proximidad de listings con 12 nodos y 25 aristas. Sobre ese grafo se ejecutan:
+
+| Algoritmo | Resultado observado |
+| --- | --- |
+| Dijkstra | 12 nodos alcanzables desde el origen |
+| Bellman-Ford | 12 nodos alcanzables desde el origen |
+| Floyd-Warshall | Matriz de caminos minimos para todos los pares |
+
+Para barrios, el prototipo genera un grafo de 9 nodos y 36 aristas. Los algoritmos Kruskal, Prim y Boruvka devuelven el mismo costo MST aproximado: 581.416 km. Tambien se ejecutan DFS y Tarjan para nodos visitados y puntos de articulacion.
+
+## Resultados M5 - Rangos y calendario
+
+Con el rango de precio 40-120, las tres estructuras reportan 7 coincidencias:
+
+| Algoritmo | Coincidencias |
+| --- | ---: |
+| Segment Tree | 7 |
+| Fenwick Tree | 7 |
+| Busqueda binaria | 7 |
+
+Para calendario dinamico, se cargan 4 entradas piloto y se simula una actualizacion de precio. Segment Tree con lazy propagation, Fenwick con actualizacion puntual y AVL reportan la misma suma final de precios: 334.00.
+
+## Interpretacion
+
+La coleccion piloto confirma que el prototipo cubre operaciones esenciales del segundo avance: localiza archivos en subdirectorios, evita busqueda secuencial para consultas por ID, utiliza indice invertido para texto, filtra por rango de precio con estructura ordenada, genera un ranking inicial mediante cola de prioridad, ejecuta algoritmos de grafos y compara estructuras de busqueda por rangos.

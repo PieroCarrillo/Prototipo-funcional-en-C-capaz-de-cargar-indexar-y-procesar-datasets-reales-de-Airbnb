@@ -14,7 +14,7 @@ if not exist "%GPP%" (
 if not exist build mkdir build
 
 echo Compilando...
-"%GPP%" -std=c++17 -O2 -Iinclude src\AirbnbIndex.cpp src\CsvReader.cpp src\DataLoader.cpp src\DirectoryScanner.cpp src\main.cpp -o "%EXE%"
+"%GPP%" -std=c++17 -O2 -Iinclude src\AirbnbIndex.cpp src\CsvReader.cpp src\DataLoader.cpp src\DirectoryScanner.cpp src\GraphAnalytics.cpp src\RangeAnalytics.cpp src\main.cpp -o "%EXE%"
 if errorlevel 1 (
   echo Error al compilar.
   exit /b 1

@@ -16,7 +16,9 @@ Desarrollar un prototipo algoritimico inicial que demuestre la viabilidad tecnic
 | Construccion del indice en memoria | `AirbnbIndex` construye indices por ID, texto, barrio y precio. |
 | Busqueda exacta y parcial | Busqueda exacta con `unordered_map<long long, size_t>` y busqueda parcial con indice invertido de tokens. |
 | Ordenamiento y filtrado | Filtro por rango de precio con `multimap<double, size_t>` y ranking con `priority_queue`. |
-| Metricas de rendimiento | Se mide tiempo de carga, indexacion, busqueda exacta, busqueda textual, filtrado y ranking con `chrono`. |
+| M4 - Busqueda en grafos | Se implementan Dijkstra, Bellman-Ford y Floyd-Warshall sobre un grafo de proximidad entre listings; tambien Kruskal, Prim, Boruvka, DFS y Tarjan sobre un grafo de barrios. |
+| M5 - Busqueda por rangos | Se implementan Segment Tree, Fenwick Tree y busqueda binaria para rangos de precio; tambien Segment Tree con lazy propagation, Fenwick con actualizacion puntual y AVL para calendario dinamico. |
+| Metricas de rendimiento | Se mide tiempo de carga, indexacion, busquedas, grafos, rangos, actualizaciones, memoria y throughput con `chrono`. |
 | Simulacion piloto | `data/pilot/` contiene dos ciudades, archivos `listings.csv`, `reviews.csv` y `calendar.csv`. |
 
 ## 4. Arquitectura del prototipo
@@ -31,6 +33,8 @@ main.cpp
    +-- DataLoader: lectura de listings desde CSV
    +-- CsvReader: parseo de lineas CSV con comillas
    +-- AirbnbIndex: indices en memoria y consultas
+   +-- GraphAnalytics: caminos minimos, MST y recorridos
+   +-- RangeAnalytics: estructuras de rango y calendario dinamico
 ```
 
 ## 5. Estructuras de datos utilizadas
@@ -42,6 +46,10 @@ main.cpp
 | Consulta por precio | `multimap<double, size_t>` | Mantiene los alojamientos ordenados por precio y facilita rangos. |
 | Ranking de mejores alojamientos | `priority_queue<size_t>` | Obtiene los elementos con mayor puntaje de forma eficiente. |
 | Almacenamiento base | `vector<Listing>` | Conserva registros contiguos y referencia por posicion. |
+| Camino minimo entre alojamientos | Grafo ponderado + Dijkstra/Bellman-Ford/Floyd-Warshall | Compara rutas de proximidad entre listings. |
+| MST entre barrios | Grafo de centroides + Kruskal/Prim/Boruvka | Calcula arbol de expansion minima entre barrios. |
+| Rango por precio | Segment Tree, Fenwick Tree, arreglo ordenado | Compara estructuras para consultas de rango. |
+| Calendario dinamico | Segment Tree lazy, Fenwick puntual, AVL | Simula cambios de precio/disponibilidad. |
 
 ## 6. Casos de prueba iniciales
 
@@ -60,6 +68,10 @@ Casos cubiertos:
 | Filtro por precio | `--min-price 40 --max-price 120` | Devuelve alojamientos dentro del rango indicado. |
 | Ordenamiento | `--top 5` | Muestra los alojamientos mas baratos y el ranking por score. |
 | Recorrido recursivo | `--data data/pilot` | Encuentra CSV dentro de `lima/` y `cusco/`. |
+| Caminos minimos | ejecucion normal | Reporta Dijkstra, Bellman-Ford y Floyd-Warshall sobre grafo de listings. |
+| MST y Tarjan | ejecucion normal | Reporta Kruskal, Prim, Boruvka, DFS y puntos de articulacion. |
+| Rangos avanzados | ejecucion normal | Compara Segment Tree, Fenwick Tree y busqueda binaria. |
+| Calendario dinamico | ejecucion normal | Compara Segment Tree lazy, Fenwick puntual y AVL. |
 
 ## 7. Metricas preliminares
 
@@ -71,6 +83,8 @@ El prototipo reporta en consola:
 - Tiempo de busqueda parcial.
 - Tiempo de filtrado por rango.
 - Tiempo de ordenamiento/ranking.
+- Tiempo de caminos minimos, MST, DFS, Tarjan, estructuras de rango y actualizaciones.
+- Throughput de consultas de rango y nodos visitados por segundo.
 - Estimacion aproximada de memoria usada por los indices.
 
 Estas metricas permiten comparar el enfoque indexado con recorridos secuenciales en el avance final.
@@ -80,14 +94,14 @@ Los resultados esperados sobre la coleccion piloto se documentan en `docs/RESULT
 ## 8. Limitaciones actuales
 
 - La coleccion incluida es piloto y pequena para facilitar revision del codigo.
-- Se cargan principalmente archivos `listings.csv`; `reviews.csv` y `calendar.csv` se detectan y quedan como base para integracion posterior.
+- Se cargan principalmente archivos `listings.csv`; `calendar.csv` ya se usa para simulacion dinamica y `reviews.csv` queda como base para integracion textual posterior.
 - La normalizacion textual es basica y no elimina tildes; esto puede mejorarse en el informe final.
 - La estimacion de memoria es aproximada porque las estructuras STL gestionan capacidad interna dependiente del compilador.
+- Los grafos se generan desde coordenadas y centroides piloto; con datasets reales puede reemplazarse por vecindad GeoJSON exacta.
 
 ## 9. Trabajo pendiente para el informe final
 
 - Integrar `reviews.csv` para busqueda masiva en comentarios.
-- Agregar consultas por distancia geografica o grafo de barrios.
 - Comparar tiempos con busqueda secuencial.
 - Probar con colecciones reales de mayor volumen.
 - Generar tablas comparativas y capturas del sistema.

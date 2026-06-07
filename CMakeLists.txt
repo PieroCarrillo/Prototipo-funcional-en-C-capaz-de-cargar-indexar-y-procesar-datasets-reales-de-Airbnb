@@ -11,7 +11,8 @@ add_executable(airbnb_indexer
     src/CsvReader.cpp
     src/DataLoader.cpp
     src/DirectoryScanner.cpp
+    src/GraphAnalytics.cpp
+    src/RangeAnalytics.cpp
 )
 
 target_include_directories(airbnb_indexer PRIVATE include)
-
