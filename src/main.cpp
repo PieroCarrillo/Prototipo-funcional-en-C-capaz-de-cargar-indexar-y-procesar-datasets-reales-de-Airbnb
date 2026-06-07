@@ -59,9 +59,9 @@ Options parseOptions(int argc, char* argv[]) {
             options.exportPath = nextValue(arg);
         } else if (arg == "--help" || arg == "-h") {
             std::cout
-                << "Uso: airbnb_indexer [--data carpeta] [--query texto] [--id numero]\\n"
-                << "                       [--min-price numero] [--max-price numero]\\n"
-                << "                       [--top numero] [--export archivo.csv]\\n";
+                << "Uso: airbnb_indexer [--data carpeta] [--query texto] [--id numero]\n"
+                << "                       [--min-price numero] [--max-price numero]\n"
+                << "                       [--top numero] [--export archivo.csv]\n";
             std::exit(0);
         } else {
             throw std::runtime_error("Parametro no reconocido: " + arg);
@@ -77,13 +77,13 @@ void printListing(const Listing& listing) {
               << " | $" << std::fixed << std::setprecision(2) << listing.price
               << " | reviews=" << listing.numberOfReviews
               << " | score=" << std::setprecision(2) << listing.score()
-              << "\\n";
+              << "\n";
 }
 
 void printSection(const std::string& title, const std::vector<const Listing*>& results) {
-    std::cout << "\\n" << title << "\\n";
+    std::cout << "\n" << title << "\n";
     if (results.empty()) {
-        std::cout << "  Sin resultados.\\n";
+        std::cout << "  Sin resultados.\n";
         return;
     }
     for (const Listing* listing : results) {
@@ -92,7 +92,7 @@ void printSection(const std::string& title, const std::vector<const Listing*>& r
 }
 
 std::string csvEscape(const std::string& value) {
-    if (value.find_first_of(",\\\"\\n") == std::string::npos) {
+    if (value.find_first_of(",\"\n") == std::string::npos) {
         return value;
     }
 
@@ -114,7 +114,7 @@ void exportResults(const std::filesystem::path& path, const std::vector<const Li
         throw std::runtime_error("No se pudo crear archivo de exportacion: " + path.string());
     }
 
-    output << "id,name,neighbourhood,room_type,price,number_of_reviews,availability_365,score\\n";
+    output << "id,name,neighbourhood,room_type,price,number_of_reviews,availability_365,score\n";
     for (const Listing* listing : results) {
         output << listing->id << ','
                << csvEscape(listing->name) << ','
@@ -123,7 +123,7 @@ void exportResults(const std::filesystem::path& path, const std::vector<const Li
                << listing->price << ','
                << listing->numberOfReviews << ','
                << listing->availability365 << ','
-               << listing->score() << "\\n";
+               << listing->score() << "\n";
     }
 }
 }
@@ -132,17 +132,17 @@ int main(int argc, char* argv[]) {
     try {
         const Options options = parseOptions(argc, argv);
 
-        std::cout << "Airbnb Indexer - Segundo Avance\\n";
-        std::cout << "Carpeta de datos: " << options.dataRoot << "\\n";
+        std::cout << "Airbnb Indexer - Segundo Avance\n";
+        std::cout << "Carpeta de datos: " << options.dataRoot << "\n";
 
         LoadReport report;
         const auto loadStart = Clock::now();
         std::vector<Listing> loadedListings = DataLoader::loadListings(options.dataRoot, report);
         const double loadMs = millisecondsSince(loadStart);
 
-        std::cout << "\\nArchivos CSV encontrados:\\n";
+        std::cout << "\nArchivos CSV encontrados:\n";
         for (const CsvFileInfo& file : report.csvFiles) {
-            std::cout << "  [" << DirectoryScanner::kindName(file.kind) << "] " << file.path.string() << "\\n";
+            std::cout << "  [" << DirectoryScanner::kindName(file.kind) << "] " << file.path.string() << "\n";
         }
 
         AirbnbIndex index;
@@ -154,24 +154,24 @@ int main(int argc, char* argv[]) {
         index.build();
         const double indexMs = millisecondsSince(indexStart);
 
-        std::cout << "\\nResumen de carga\\n";
-        std::cout << "  Archivos listings: " << report.listingFiles << "\\n";
-        std::cout << "  Filas leidas: " << report.rowsRead << "\\n";
-        std::cout << "  Listings cargados: " << report.rowsLoaded << "\\n";
-        std::cout << "  Filas omitidas: " << report.rowsSkipped << "\\n";
-        std::cout << "  Tiempo de carga: " << std::fixed << std::setprecision(3) << loadMs << " ms\\n";
-        std::cout << "  Tiempo de indexacion: " << indexMs << " ms\\n";
-        std::cout << "  Memoria estimada indices: " << index.estimatedMemoryBytes() << " bytes\\n";
+        std::cout << "\nResumen de carga\n";
+        std::cout << "  Archivos listings: " << report.listingFiles << "\n";
+        std::cout << "  Filas leidas: " << report.rowsRead << "\n";
+        std::cout << "  Listings cargados: " << report.rowsLoaded << "\n";
+        std::cout << "  Filas omitidas: " << report.rowsSkipped << "\n";
+        std::cout << "  Tiempo de carga: " << std::fixed << std::setprecision(3) << loadMs << " ms\n";
+        std::cout << "  Tiempo de indexacion: " << indexMs << " ms\n";
+        std::cout << "  Memoria estimada indices: " << index.estimatedMemoryBytes() << " bytes\n";
 
         const auto exactStart = Clock::now();
         const Listing* exact = index.findById(options.id);
         const double exactMs = millisecondsSince(exactStart);
 
-        std::cout << "\\nBusqueda exacta por ID " << options.id << " (" << exactMs << " ms)\\n";
+        std::cout << "\nBusqueda exacta por ID " << options.id << " (" << exactMs << " ms)\n";
         if (exact) {
             printListing(*exact);
         } else {
-            std::cout << "  No encontrado.\\n";
+            std::cout << "  No encontrado.\n";
         }
 
         const auto textStart = Clock::now();
@@ -200,12 +200,12 @@ int main(int argc, char* argv[]) {
 
         if (!options.exportPath.empty()) {
             exportResults(options.exportPath, ranked);
-            std::cout << "\\nResultados exportados a: " << options.exportPath << "\\n";
+            std::cout << "\nResultados exportados a: " << options.exportPath << "\n";
         }
 
         return 0;
     } catch (const std::exception& error) {
-        std::cerr << "Error: " << error.what() << "\\n";
+        std::cerr << "Error: " << error.what() << "\n";
         return 1;
     }
 }
