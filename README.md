@@ -137,4 +137,3 @@ El programa imprime:
 - Resultados M4 de grafos: caminos minimos, MST, DFS y Tarjan.
 - Resultados M5 de rangos: Segment Tree, Fenwick, busqueda binaria y actualizaciones dinamicas de calendario.
 
-El documento del avance esta en `docs/AVANCE_2_GRUPO_03.md` y los resultados preliminares estan en `docs/RESULTADOS_PRELIMINARES.md`.
