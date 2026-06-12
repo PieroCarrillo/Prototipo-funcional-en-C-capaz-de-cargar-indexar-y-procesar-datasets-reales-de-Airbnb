@@ -1,8 +1,52 @@
 #include "CsvReader.hpp"
 
 #include <fstream>
+#include <istream>
 #include <stdexcept>
 #include <utility>
+
+namespace {
+/**
+ * Lee un registro CSV logico. Un registro puede ocupar varias lineas fisicas
+ * cuando un campo entre comillas contiene saltos de linea.
+ */
+bool readRecord(std::istream& input, std::vector<std::string>& values) {
+    values.clear();
+    std::string current;
+    bool insideQuotes = false;
+    bool readAnyCharacter = false;
+    char ch = '\0';
+
+    while (input.get(ch)) {
+        readAnyCharacter = true;
+
+        if (ch == '"') {
+            if (insideQuotes && input.peek() == '"') {
+                input.get(ch);
+                current.push_back('"');
+            } else {
+                insideQuotes = !insideQuotes;
+            }
+        } else if (ch == ',' && !insideQuotes) {
+            values.push_back(current);
+            current.clear();
+        } else if ((ch == '\n' || ch == '\r') && !insideQuotes) {
+            if (ch == '\r' && input.peek() == '\n') {
+                input.get(ch);
+            }
+            values.push_back(current);
+            return true;
+        } else {
+            current.push_back(ch);
+        }
+    }
+
+    if (readAnyCharacter) {
+        values.push_back(current);
+    }
+    return readAnyCharacter;
+}
+}
 
 // Analiza una linea caracter por caracter para no separar comas que formen
 // parte de un campo encerrado entre comillas.
@@ -40,21 +84,24 @@ std::vector<CsvReader::Row> CsvReader::read(const std::filesystem::path& filePat
         throw std::runtime_error("No se pudo abrir el archivo CSV: " + filePath.string());
     }
 
-    std::string headerLine;
-    if (!std::getline(input, headerLine)) {
+    std::vector<std::string> headers;
+    if (!readRecord(input, headers)) {
         return {};
     }
+    if (!headers.empty() && headers.front().size() >= 3 &&
+        static_cast<unsigned char>(headers.front()[0]) == 0xEF &&
+        static_cast<unsigned char>(headers.front()[1]) == 0xBB &&
+        static_cast<unsigned char>(headers.front()[2]) == 0xBF) {
+        headers.front().erase(0, 3);
+    }
 
-    std::vector<std::string> headers = parseLine(headerLine);
     std::vector<Row> rows;
-    std::string line;
-
-    while (std::getline(input, line)) {
-        if (line.empty()) {
+    std::vector<std::string> values;
+    while (readRecord(input, values)) {
+        if (values.size() == 1 && values.front().empty()) {
             continue;
         }
 
-        std::vector<std::string> values = parseLine(line);
         Row row;
         for (std::size_t i = 0; i < headers.size(); ++i) {
             row[headers[i]] = i < values.size() ? values[i] : "";

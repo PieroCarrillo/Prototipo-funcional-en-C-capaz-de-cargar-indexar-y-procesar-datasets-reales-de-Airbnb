@@ -24,7 +24,9 @@ void AirbnbIndex::build() {
     for (std::size_t index = 0; index < listings_.size(); ++index) {
         const Listing& listing = listings_[index];
         byId_[listing.id] = index;
-        byPrice_.insert({listing.price, index});
+        if (listing.hasPrice) {
+            byPrice_.insert({listing.price, index});
+        }
         byNeighbourhood_[normalize(listing.neighbourhood)].push_back(index);
 
         std::unordered_set<std::string> uniqueTokens;

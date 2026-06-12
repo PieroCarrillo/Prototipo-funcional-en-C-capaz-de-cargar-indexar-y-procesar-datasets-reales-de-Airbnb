@@ -4,6 +4,7 @@
 #include "GraphAnalytics.hpp"
 #include "RangeAnalytics.hpp"
 
+#include <algorithm>
 #include <chrono>
 #include <cstdlib>
 #include <filesystem>
@@ -27,6 +28,7 @@ struct Options {
     double minPrice = 40.0;
     double maxPrice = 120.0;
     std::size_t top = 5;
+    std::size_t graphLimit = 100;
     std::filesystem::path exportPath;
 };
 
@@ -60,13 +62,16 @@ Options parseOptions(int argc, char* argv[]) {
             options.maxPrice = std::stod(nextValue(arg));
         } else if (arg == "--top") {
             options.top = static_cast<std::size_t>(std::stoul(nextValue(arg)));
+        } else if (arg == "--graph-limit") {
+            options.graphLimit = static_cast<std::size_t>(std::stoul(nextValue(arg)));
         } else if (arg == "--export") {
             options.exportPath = nextValue(arg);
         } else if (arg == "--help" || arg == "-h") {
             std::cout
                 << "Uso: airbnb_indexer [--data carpeta] [--query texto] [--id numero]\n"
                 << "                       [--min-price numero] [--max-price numero]\n"
-                << "                       [--top numero] [--export archivo.csv]\n";
+                << "                       [--top numero] [--graph-limit numero]\n"
+                << "                       [--export archivo.csv]\n";
             std::exit(0);
         } else {
             throw std::runtime_error("Parametro no reconocido: " + arg);
@@ -79,8 +84,13 @@ Options parseOptions(int argc, char* argv[]) {
 void printListing(const Listing& listing) {
     std::cout << "  #" << listing.id << " | " << listing.name
               << " | " << listing.neighbourhood
-              << " | " << listing.roomType
-              << " | $" << std::fixed << std::setprecision(2) << listing.price
+              << " | " << listing.roomType;
+    if (listing.hasPrice) {
+        std::cout << " | $" << std::fixed << std::setprecision(2) << listing.price;
+    } else {
+        std::cout << " | precio=N/D";
+    }
+    std::cout
               << " | reviews=" << listing.numberOfReviews
               << " | score=" << std::setprecision(2) << listing.score()
               << "\n";
@@ -244,7 +254,14 @@ int main(int argc, char* argv[]) {
 
         // Etapa 5 - Modulo M4: caminos minimos entre alojamientos.
         std::cout << "\nM4 - Busqueda en grafos sobre proximidad geografica\n";
-        WeightedGraph listingGraph = GraphAnalytics::buildListingProximityGraph(index.listings(), 3);
+        const std::size_t graphSize = std::min(options.graphLimit, index.listings().size());
+        std::vector<Listing> graphListings(
+            index.listings().begin(),
+            index.listings().begin() + graphSize
+        );
+        WeightedGraph listingGraph = GraphAnalytics::buildListingProximityGraph(graphListings, 3);
+        std::cout << "  Muestra de listings usada=" << graphSize
+                  << " de " << index.listings().size() << "\n";
         std::cout << "  Grafo de listings: nodos=" << listingGraph.labels.size()
                   << " | aristas=" << listingGraph.edges.size() << "\n";
         if (!listingGraph.labels.empty()) {

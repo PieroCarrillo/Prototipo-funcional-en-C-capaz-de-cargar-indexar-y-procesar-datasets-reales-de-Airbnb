@@ -287,7 +287,9 @@ std::vector<double> listingPrices(const std::vector<Listing>& listings) {
     std::vector<double> prices;
     prices.reserve(listings.size());
     for (const Listing& listing : listings) {
-        prices.push_back(listing.price);
+        if (listing.hasPrice) {
+            prices.push_back(listing.price);
+        }
     }
     std::sort(prices.begin(), prices.end());
     return prices;
@@ -360,25 +362,25 @@ CalendarSimulationResult RangeAnalytics::simulateCalendarUpdates(const std::vect
         return result;
     }
 
-    std::vector<double> prices;
-    prices.reserve(entries.size());
+    std::vector<double> values;
+    values.reserve(entries.size());
     for (const CalendarEntry& entry : entries) {
-        prices.push_back(entry.price);
+        values.push_back(entry.price > 0.0 ? entry.price : (entry.available ? 1.0 : 0.0));
     }
 
     const std::size_t left = 0;
-    const std::size_t right = prices.size() - 1;
+    const std::size_t right = values.size() - 1;
 
     const auto segmentStart = Clock::now();
-    LazySegmentTree segmentTree(prices);
+    LazySegmentTree segmentTree(values);
     segmentTree.rangeAdd(left, left, 2.0);
     result.segmentTreeSum = segmentTree.rangeSum(left, right);
     result.segmentTreeLazyMs = elapsedMs(segmentStart);
 
     const auto fenwickStart = Clock::now();
-    FenwickTree fenwick(prices.size());
-    for (std::size_t i = 0; i < prices.size(); ++i) {
-        fenwick.add(i, prices[i]);
+    FenwickTree fenwick(values.size());
+    for (std::size_t i = 0; i < values.size(); ++i) {
+        fenwick.add(i, values[i]);
     }
     fenwick.add(0, 2.0);
     result.fenwickSum = fenwick.rangeSum(left, right);
@@ -386,10 +388,10 @@ CalendarSimulationResult RangeAnalytics::simulateCalendarUpdates(const std::vect
 
     const auto avlStart = Clock::now();
     AvlTree avl;
-    for (std::size_t i = 0; i < prices.size(); ++i) {
-        avl.insertOrAssign(static_cast<int>(i), prices[i]);
+    for (std::size_t i = 0; i < values.size(); ++i) {
+        avl.insertOrAssign(static_cast<int>(i), values[i]);
     }
-    avl.insertOrAssign(0, prices[0] + 2.0);
+    avl.insertOrAssign(0, values[0] + 2.0);
     result.avlSum = avl.rangeSum(static_cast<int>(left), static_cast<int>(right));
     result.avlUpdateQueryMs = elapsedMs(avlStart);
 

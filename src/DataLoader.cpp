@@ -75,7 +75,9 @@ std::vector<Listing> DataLoader::loadListings(const std::filesystem::path& root,
             listing.hostName = getValue(row, "host_name");
             listing.neighbourhood = getValue(row, "neighbourhood");
             listing.roomType = getValue(row, "room_type");
-            listing.price = toDouble(getValue(row, "price"));
+            const std::string rawPrice = getValue(row, "price");
+            listing.hasPrice = !cleanNumber(rawPrice).empty();
+            listing.price = toDouble(rawPrice);
             listing.minimumNights = toInt(getValue(row, "minimum_nights"));
             listing.numberOfReviews = toInt(getValue(row, "number_of_reviews"));
             listing.reviewsPerMonth = toDouble(getValue(row, "reviews_per_month"));

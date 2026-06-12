@@ -22,4 +22,8 @@ if errorlevel 1 (
 
 echo.
 echo Ejecutando...
-"%EXE%" --data data\pilot --query playa --id 1001 --min-price 40 --max-price 120 --top 5
+if "%~1"=="" (
+  "%EXE%" --data data\pilot --query playa --id 1001 --min-price 40 --max-price 120 --top 5 --graph-limit 100
+) else (
+  "%EXE%" %*
+)

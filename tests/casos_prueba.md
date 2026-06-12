@@ -92,3 +92,22 @@ Resultado esperado:
 
 - Segment Tree, Fenwick Tree y busqueda binaria reportan la misma cantidad de coincidencias.
 - La simulacion de calendario dinamico ejecuta Segment Tree lazy, Fenwick puntual y AVL.
+
+## CP08 - Dataset real de Paris
+
+Comandos:
+
+```cmd
+.\import_paris.bat
+.\run_paris.bat
+```
+
+Resultado esperado:
+
+- Carga exactamente 82,467 listings sin omitir filas.
+- Reconoce 20 barrios.
+- Carga una muestra de 100,000 registros reales de calendario.
+- Muestra precios faltantes como `N/D`.
+- Dijkstra, Bellman-Ford y Floyd-Warshall alcanzan los 100 nodos de la muestra.
+- Kruskal, Prim y Boruvka obtienen el mismo costo MST.
+- Segment Tree, Fenwick Tree y busqueda binaria obtienen 18,082 coincidencias.

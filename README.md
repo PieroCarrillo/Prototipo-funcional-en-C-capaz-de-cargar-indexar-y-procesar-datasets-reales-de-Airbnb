@@ -87,7 +87,48 @@ Ejemplo en Windows:
 | `--min-price` | Precio minimo del filtro | `40` |
 | `--max-price` | Precio maximo del filtro | `120` |
 | `--top` | Numero maximo de resultados por seccion | `5` |
+| `--graph-limit` | Maximo de listings usados por los algoritmos de grafos | `100` |
 | `--export` | Ruta opcional para exportar resultados CSV | sin exportar |
+
+## Dataset real de Paris
+
+El archivo `Paris.zip` entregado por el profesor contiene:
+
+- 82,467 registros en `listings.csv`.
+- 2,281,438 registros resumidos en `reviews.csv`.
+- 20 barrios en `neighbourhoods.csv`.
+- 20 poligonos en `neighbourhoods.geojson`.
+- Versiones detalladas o masivas comprimidas de listings, reviews y calendar.
+
+Para importar los archivos resumidos desde la ubicacion predeterminada:
+
+```cmd
+.\import_paris.bat
+```
+
+Para importar desde otra ubicacion:
+
+```cmd
+.\import_paris.bat "C:\ruta\Paris.zip"
+```
+
+Para compilar y ejecutar directamente con Paris:
+
+```cmd
+.\run_paris.bat
+```
+
+Los datos se extraen en `data/real/Paris`, carpeta excluida de Git para evitar
+subir cientos de megabytes al repositorio. El programa carga todos los
+listings, pero limita el grafo a una muestra configurable porque
+Floyd-Warshall tiene complejidad O(V^3). Durante la importacion tambien se
+genera un `calendar.csv` con las primeras 100,000 filas reales del archivo
+comprimido que se encuentran disponibles (`available=t`), suficiente para
+validar Segment Tree lazy, Fenwick y AVL sin
+descomprimir los mas de 30 millones de registros completos. En la entrega de
+Paris, `price` y `adjusted_price` estan vacios en todo el calendario; por ello
+el modulo dinamico usa precio cuando existe y disponibilidad binaria cuando
+el precio no fue publicado.
 
 ## Uso con datasets reales
 
@@ -137,3 +178,5 @@ El programa imprime:
 - Resultados M4 de grafos: caminos minimos, MST, DFS y Tarjan.
 - Resultados M5 de rangos: Segment Tree, Fenwick, busqueda binaria y actualizaciones dinamicas de calendario.
 
+La validacion con la coleccion real del profesor esta documentada en
+`docs/RESULTADOS_PARIS.md`.

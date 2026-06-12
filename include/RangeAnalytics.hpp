@@ -47,8 +47,10 @@ public:
     );
 
     /**
-     * Simula una actualizacion de precio usando Segment Tree con lazy
-     * propagation, Fenwick Tree con actualizacion puntual y arbol AVL.
+     * Simula una actualizacion usando Segment Tree con lazy propagation,
+     * Fenwick Tree con actualizacion puntual y arbol AVL. Se usa el precio
+     * cuando esta disponible; de lo contrario se representa disponibilidad
+     * como 1 y no disponibilidad como 0.
      */
     static CalendarSimulationResult simulateCalendarUpdates(const std::vector<CalendarEntry>& entries);
 };
