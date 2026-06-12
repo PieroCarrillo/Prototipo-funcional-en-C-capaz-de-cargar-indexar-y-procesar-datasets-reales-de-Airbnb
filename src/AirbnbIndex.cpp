@@ -7,10 +7,14 @@
 #include <unordered_set>
 #include <utility>
 
+// La coleccion base conserva cada Listing una sola vez. Los indices almacenan
+// posiciones para evitar duplicar registros completos en memoria.
 void AirbnbIndex::add(Listing listing) {
     listings_.push_back(std::move(listing));
 }
 
+// Reconstruye todos los indices. Esta operacion se realiza despues de terminar
+// la carga para que las consultas posteriores sean rapidas.
 void AirbnbIndex::build() {
     byId_.clear();
     textIndex_.clear();
@@ -60,6 +64,8 @@ std::vector<const Listing*> AirbnbIndex::searchText(const std::string& query, st
         return {};
     }
 
+    // La frecuencia funciona como una relevancia simple: un registro que
+    // coincide con mas tokens aparece primero en el resultado.
     std::unordered_map<std::size_t, int> frequency;
     for (const std::string& token : queryTokens) {
         auto exactIt = textIndex_.find(token);
@@ -98,6 +104,8 @@ std::vector<const Listing*> AirbnbIndex::searchText(const std::string& query, st
 }
 
 std::vector<const Listing*> AirbnbIndex::filterByPrice(double minPrice, double maxPrice, std::size_t limit) const {
+    // multimap mantiene las claves ordenadas y permite iniciar directamente en
+    // el limite inferior, sin recorrer precios menores al rango solicitado.
     std::vector<const Listing*> result;
     for (auto it = byPrice_.lower_bound(minPrice); it != byPrice_.end() && it->first <= maxPrice; ++it) {
         result.push_back(&listings_[it->second]);
@@ -144,6 +152,7 @@ std::vector<const Listing*> AirbnbIndex::sortByReviews(std::size_t limit) const 
 }
 
 std::vector<const Listing*> AirbnbIndex::topRanked(std::size_t limit) const {
+    // La cola de prioridad conserva primero el alojamiento con mayor score.
     auto compare = [this](std::size_t left, std::size_t right) {
         return listings_[left].score() < listings_[right].score();
     };
@@ -162,6 +171,8 @@ std::vector<const Listing*> AirbnbIndex::topRanked(std::size_t limit) const {
 }
 
 std::size_t AirbnbIndex::estimatedMemoryBytes() const {
+    // La STL no expone el consumo exacto del asignador. Esta estimacion usa
+    // tamanos y capacidades para producir una metrica comparable.
     std::size_t total = sizeof(*this) + listings_.capacity() * sizeof(Listing);
     total += byId_.size() * (sizeof(long long) + sizeof(std::size_t));
     total += byPrice_.size() * (sizeof(double) + sizeof(std::size_t));

@@ -12,6 +12,7 @@ double elapsedMs(const Clock::time_point& start) {
     return std::chrono::duration<double, std::milli>(Clock::now() - start).count();
 }
 
+// Arbol de segmentos estatico para consultas de suma sobre intervalos.
 class SegmentTree {
 public:
     explicit SegmentTree(const std::vector<double>& values) {
@@ -54,6 +55,8 @@ private:
     std::vector<double> tree_;
 };
 
+// Arbol de segmentos con propagacion diferida. Una actualizacion de rango se
+// registra en nodos internos y se distribuye solo cuando una consulta lo exige.
 class LazySegmentTree {
 public:
     explicit LazySegmentTree(const std::vector<double>& values) {
@@ -131,6 +134,8 @@ private:
     }
 };
 
+// Fenwick Tree o Binary Indexed Tree: estructura compacta para sumas prefijas
+// y actualizaciones puntuales en O(log n).
 class FenwickTree {
 public:
     explicit FenwickTree(std::size_t size) : tree_(size + 1, 0.0) {}
@@ -164,6 +169,7 @@ private:
     std::vector<double> tree_;
 };
 
+// Nodo AVL aumentado con la suma del subarbol para responder rangos.
 struct AvlNode {
     int key = 0;
     double value = 0.0;
@@ -228,6 +234,8 @@ std::unique_ptr<AvlNode> balance(std::unique_ptr<AvlNode> node) {
     return node;
 }
 
+// Arbol binario de busqueda auto-balanceado. Las rotaciones mantienen altura
+// logaritmica despues de insertar o actualizar precios.
 class AvlTree {
 public:
     void insertOrAssign(int key, double value) {
@@ -303,6 +311,9 @@ std::vector<RangeMetric> RangeAnalytics::comparePriceRange(
     double minPrice,
     double maxPrice
 ) {
+    // Los precios se ordenan y se convierten en posiciones. Las tres
+    // estrategias consultan exactamente el mismo intervalo para validar que
+    // sus cantidades de coincidencias sean consistentes.
     std::vector<RangeMetric> metrics;
     const std::vector<double> prices = listingPrices(listings);
     if (prices.empty()) {
@@ -341,6 +352,8 @@ std::vector<RangeMetric> RangeAnalytics::comparePriceRange(
 }
 
 CalendarSimulationResult RangeAnalytics::simulateCalendarUpdates(const std::vector<CalendarEntry>& entries) {
+    // Se aplica la misma actualizacion puntual de +2 al primer precio. La suma
+    // final debe coincidir en las tres estructuras dinamicas.
     CalendarSimulationResult result;
     result.entries = entries.size();
     if (entries.empty()) {

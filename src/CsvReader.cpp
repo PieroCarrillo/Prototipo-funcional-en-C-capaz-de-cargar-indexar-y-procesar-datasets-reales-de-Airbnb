@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <utility>
 
+// Analiza una linea caracter por caracter para no separar comas que formen
+// parte de un campo encerrado entre comillas.
 std::vector<std::string> CsvReader::parseLine(const std::string& line) {
     std::vector<std::string> values;
     std::string current;
@@ -30,6 +32,8 @@ std::vector<std::string> CsvReader::parseLine(const std::string& line) {
     return values;
 }
 
+// La primera fila define los nombres de columna. Las filas posteriores se
+// convierten en mapas para que otros modulos consulten campos por nombre.
 std::vector<CsvReader::Row> CsvReader::read(const std::filesystem::path& filePath) {
     std::ifstream input(filePath);
     if (!input) {

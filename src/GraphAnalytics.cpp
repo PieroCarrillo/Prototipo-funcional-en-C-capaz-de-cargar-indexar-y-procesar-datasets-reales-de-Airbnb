@@ -15,6 +15,8 @@ using Clock = std::chrono::steady_clock;
 constexpr double EarthRadiusKm = 6371.0;
 constexpr double Inf = std::numeric_limits<double>::infinity();
 
+// Las distancias geograficas se calculan sobre la superficie terrestre con la
+// formula de Haversine. El resultado se expresa en kilometros.
 double elapsedMs(const Clock::time_point& start) {
     return std::chrono::duration<double, std::milli>(Clock::now() - start).count();
 }
@@ -40,6 +42,8 @@ void addUndirectedEdge(WeightedGraph& graph, int from, int to, double weight) {
     graph.adjacency[to].push_back({to, from, weight});
 }
 
+// Estructura Union-Find empleada por Kruskal y Boruvka para mantener los
+// componentes conectados sin formar ciclos.
 struct DisjointSet {
     std::vector<int> parent;
     std::vector<int> rank;
@@ -107,6 +111,9 @@ WeightedGraph GraphAnalytics::buildListingProximityGraph(
     const std::vector<Listing>& listings,
     std::size_t nearestNeighbors
 ) {
+    // Cada alojamiento se conecta inicialmente con sus vecinos mas cercanos.
+    // Despues se agrega una cadena de respaldo para garantizar que el grafo
+    // piloto sea conexo y todos los algoritmos alcancen los mismos nodos.
     WeightedGraph graph;
     graph.labels.reserve(listings.size());
     graph.adjacency.resize(listings.size());
@@ -166,6 +173,8 @@ WeightedGraph GraphAnalytics::buildListingProximityGraph(
 }
 
 WeightedGraph GraphAnalytics::buildNeighbourhoodGraph(const std::vector<Listing>& listings) {
+    // Como la coleccion piloto no incluye poligonos GeoJSON, cada barrio se
+    // representa por el promedio de las coordenadas de sus alojamientos.
     struct Accumulator {
         double lat = 0.0;
         double lon = 0.0;
@@ -210,6 +219,8 @@ WeightedGraph GraphAnalytics::buildNeighbourhoodGraph(const std::vector<Listing>
 }
 
 ShortestPathSummary GraphAnalytics::runDijkstra(const WeightedGraph& graph, int source) {
+    // Dijkstra selecciona repetidamente la menor distancia pendiente mediante
+    // una cola de prioridad. Es adecuado porque las distancias son positivas.
     const auto start = Clock::now();
     std::vector<double> distances(graph.labels.size(), Inf);
     using Item = std::pair<double, int>;
@@ -236,6 +247,8 @@ ShortestPathSummary GraphAnalytics::runDijkstra(const WeightedGraph& graph, int 
 }
 
 ShortestPathSummary GraphAnalytics::runBellmanFord(const WeightedGraph& graph, int source) {
+    // Bellman-Ford relaja todas las aristas hasta V-1 veces. Aunque el grafo no
+    // contiene pesos negativos, permite comparar otra estrategia de caminos.
     const auto start = Clock::now();
     std::vector<double> distances(graph.labels.size(), Inf);
     distances[source] = 0.0;
@@ -261,6 +274,8 @@ ShortestPathSummary GraphAnalytics::runBellmanFord(const WeightedGraph& graph, i
 }
 
 ShortestPathSummary GraphAnalytics::runFloydWarshall(const WeightedGraph& graph) {
+    // La matriz de distancias se actualiza usando cada nodo como intermediario.
+    // Su costo O(V^3) lo hace apropiado para grafos pequenos o medianos.
     const auto start = Clock::now();
     const std::size_t n = graph.labels.size();
     std::vector<std::vector<double>> distances(n, std::vector<double>(n, Inf));
@@ -288,6 +303,8 @@ ShortestPathSummary GraphAnalytics::runFloydWarshall(const WeightedGraph& graph)
 }
 
 MstSummary GraphAnalytics::runKruskal(const WeightedGraph& graph) {
+    // Kruskal procesa aristas de menor a mayor peso y usa Union-Find para
+    // aceptar solo aquellas que conectan componentes diferentes.
     const auto start = Clock::now();
     std::vector<GraphEdge> edges = graph.edges;
     std::sort(edges.begin(), edges.end(), [](const GraphEdge& left, const GraphEdge& right) {
@@ -309,6 +326,8 @@ MstSummary GraphAnalytics::runKruskal(const WeightedGraph& graph) {
 }
 
 MstSummary GraphAnalytics::runPrim(const WeightedGraph& graph) {
+    // Prim expande un unico arbol tomando siempre la arista disponible de
+    // menor peso desde una cola de prioridad.
     const auto start = Clock::now();
     MstSummary summary;
     summary.algorithm = "Prim";
@@ -345,6 +364,8 @@ MstSummary GraphAnalytics::runPrim(const WeightedGraph& graph) {
 }
 
 MstSummary GraphAnalytics::runBoruvka(const WeightedGraph& graph) {
+    // Boruvka selecciona en cada ronda la arista saliente mas economica de
+    // cada componente hasta obtener un solo componente conectado.
     const auto start = Clock::now();
     MstSummary summary;
     summary.algorithm = "Boruvka";
@@ -397,6 +418,8 @@ MstSummary GraphAnalytics::runBoruvka(const WeightedGraph& graph) {
 }
 
 TraversalSummary GraphAnalytics::runDfsAndTarjan(const WeightedGraph& graph) {
+    // Primero se mide un DFS iterativo. Luego Tarjan calcula tiempos de
+    // descubrimiento y valores low para detectar puntos de articulacion.
     TraversalSummary summary;
     const std::size_t n = graph.labels.size();
     std::vector<bool> visited(n, false);

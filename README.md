@@ -28,6 +28,14 @@ Este repositorio contiene el segundo avance del trabajo final: un prototipo en C
 `-- tests/casos_prueba.md
 ```
 
+## Documentacion del codigo
+
+Las clases, estructuras y metodos publicos incluyen comentarios formales con
+estilo Doxygen (`@brief`). Visual Studio Code puede mostrar estas descripciones
+al posicionar el cursor sobre los simbolos. Las implementaciones tambien
+incluyen comentarios de bloque para explicar las etapas, estructuras y
+decisiones algoritmicas principales.
+
 ## Compilacion
 
 Con CMake:

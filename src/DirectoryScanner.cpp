@@ -5,6 +5,7 @@
 #include <string>
 
 namespace {
+// Normaliza nombres y extensiones para clasificarlos sin depender de mayusculas.
 std::string toLower(std::string value) {
     std::transform(value.begin(), value.end(), value.begin(), [](unsigned char ch) {
         return static_cast<char>(std::tolower(ch));
@@ -13,6 +14,7 @@ std::string toLower(std::string value) {
 }
 }
 
+// El recorrido recursivo permite procesar colecciones separadas por ciudad.
 std::vector<CsvFileInfo> DirectoryScanner::findCsvFiles(const std::filesystem::path& root) {
     std::vector<CsvFileInfo> files;
     if (!std::filesystem::exists(root)) {
@@ -36,6 +38,7 @@ std::vector<CsvFileInfo> DirectoryScanner::findCsvFiles(const std::filesystem::p
     return files;
 }
 
+// La clasificacion por nombre evita abrir el archivo para determinar su tipo.
 CsvKind DirectoryScanner::classify(const std::filesystem::path& filePath) {
     const std::string filename = toLower(filePath.filename().string());
     if (filename.find("listings") != std::string::npos) {
@@ -67,4 +70,3 @@ const char* DirectoryScanner::kindName(CsvKind kind) {
             return "other";
     }
 }
-

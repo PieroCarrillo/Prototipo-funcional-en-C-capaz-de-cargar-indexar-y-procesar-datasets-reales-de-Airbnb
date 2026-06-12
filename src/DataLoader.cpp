@@ -10,6 +10,8 @@
 #include <utility>
 
 namespace {
+// Funciones auxiliares de limpieza y conversion. Los datasets Airbnb pueden
+// contener simbolos monetarios, separadores y valores vacios.
 std::string getValue(const CsvReader::Row& row, const std::string& key) {
     auto it = row.find(key);
     if (it != row.end()) {
@@ -50,6 +52,7 @@ double toDouble(const std::string& value, double fallback = 0.0) {
 }
 }
 
+// Carga todos los listings detectados y descarta registros sin identidad.
 std::vector<Listing> DataLoader::loadListings(const std::filesystem::path& root, LoadReport& report) {
     report = LoadReport{};
     report.csvFiles = DirectoryScanner::findCsvFiles(root);
@@ -94,6 +97,7 @@ std::vector<Listing> DataLoader::loadListings(const std::filesystem::path& root,
     return listings;
 }
 
+// Carga precios y disponibilidad diaria para la simulacion dinamica del M5.
 std::vector<CalendarEntry> DataLoader::loadCalendar(const std::filesystem::path& root, CalendarReport& report) {
     report = CalendarReport{};
     report.csvFiles = DirectoryScanner::findCsvFiles(root);
