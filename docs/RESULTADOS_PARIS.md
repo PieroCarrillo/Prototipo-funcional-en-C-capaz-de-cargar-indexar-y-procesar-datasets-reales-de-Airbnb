@@ -26,7 +26,8 @@ excluida mediante `.gitignore`.
 - Los indices de precio solo incluyen registros que publican un precio.
 - El grafo usa todos los barrios, pero limita Floyd-Warshall a una muestra
   configurable de listings para controlar su complejidad O(V^3).
-- Se genera una muestra de 100,000 filas disponibles del calendario.
+- La importacion actual descomprime las 30,100,525 filas del calendario.
+- La lectura de calendario usa streaming y agrega valores por alojamiento.
 - Como el calendario de Paris no publica precios, M5 usa disponibilidad
   binaria: disponible = 1 y no disponible = 0.
 
@@ -38,7 +39,7 @@ excluida mediante `.gitignore`.
 | Listings cargados | 82,467 |
 | Filas omitidas | 0 |
 | Barrios detectados | 20 |
-| Calendarios cargados | 100,000 |
+| Calendarios de la validacion previa | 100,000 |
 | Memoria estimada de indices | 45,116,134 bytes |
 
 ## Resultados funcionales
@@ -72,8 +73,11 @@ Las tres estrategias devolvieron 18,082 coincidencias para el rango 40-120:
 | Fenwick Tree | 18,082 |
 | Busqueda binaria | 18,082 |
 
-Para 100,000 registros de calendario, Segment Tree lazy, Fenwick puntual y AVL
-obtuvieron el mismo valor acumulado final: 100,002.
+La validacion previa uso 100,000 registros y produjo el mismo acumulado en
+Segment Tree lazy, Fenwick puntual y AVL. La version actual procesa las
+30,100,525 filas mediante streaming y ejecuta las tres estructuras sobre los
+valores agregados por alojamiento. La ejecucion masiva queda pendiente de la
+prueba local solicitada por el usuario.
 
 ## Ejecucion
 
@@ -81,3 +85,6 @@ obtuvieron el mismo valor acumulado final: 100,002.
 .\import_paris.bat
 .\run_paris.bat
 ```
+
+Al seleccionar M5, opcion 2, la consola informa el total de filas leidas,
+filas validas, filas omitidas y alojamientos agregados.

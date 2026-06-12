@@ -5,8 +5,10 @@
 #include <algorithm>
 #include <cctype>
 #include <cstdlib>
+#include <limits>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <utility>
 
 namespace {
@@ -49,6 +51,17 @@ double toDouble(const std::string& value, double fallback = 0.0) {
     char* end = nullptr;
     const double parsed = std::strtod(cleaned.c_str(), &end);
     return end == cleaned.c_str() ? fallback : parsed;
+}
+
+std::size_t columnIndex(const std::vector<std::string>& headers, const std::string& name) {
+    auto it = std::find(headers.begin(), headers.end(), name);
+    return it == headers.end()
+        ? std::numeric_limits<std::size_t>::max()
+        : static_cast<std::size_t>(it - headers.begin());
+}
+
+std::string valueAt(const std::vector<std::string>& values, std::size_t index) {
+    return index < values.size() ? values[index] : "";
 }
 }
 
@@ -99,38 +112,65 @@ std::vector<Listing> DataLoader::loadListings(const std::filesystem::path& root,
     return listings;
 }
 
-// Carga precios y disponibilidad diaria para la simulacion dinamica del M5.
-std::vector<CalendarEntry> DataLoader::loadCalendar(const std::filesystem::path& root, CalendarReport& report) {
+// Recorre todo el calendario y reduce sus filas a un valor acumulado por
+// alojamiento. Esta estrategia conserva la cobertura total sin mantener
+// decenas de millones de cadenas y registros completos en memoria.
+std::vector<double> DataLoader::loadCalendarAggregates(
+    const std::filesystem::path& root,
+    CalendarReport& report
+) {
     report = CalendarReport{};
     report.csvFiles = DirectoryScanner::findCsvFiles(root);
 
-    std::vector<CalendarEntry> entries;
+    std::unordered_map<long long, double> totalsByListing;
     for (const CsvFileInfo& fileInfo : report.csvFiles) {
         if (fileInfo.kind != CsvKind::Calendar) {
             continue;
         }
 
         ++report.calendarFiles;
-        const std::vector<CsvReader::Row> rows = CsvReader::read(fileInfo.path);
-        report.rowsRead += rows.size();
+        std::size_t listingIdIndex = std::numeric_limits<std::size_t>::max();
+        std::size_t dateIndex = std::numeric_limits<std::size_t>::max();
+        std::size_t availableIndex = std::numeric_limits<std::size_t>::max();
+        std::size_t priceIndex = std::numeric_limits<std::size_t>::max();
+        bool columnsResolved = false;
 
-        for (const CsvReader::Row& row : rows) {
-            CalendarEntry entry;
-            entry.listingId = toLongLong(getValue(row, "listing_id"));
-            entry.date = getValue(row, "date");
-            entry.available = getValue(row, "available") == "t" || getValue(row, "available") == "true";
-            entry.price = toDouble(getValue(row, "price"));
-            entry.sourceFile = fileInfo.path.string();
-
-            if (entry.listingId == 0 || entry.date.empty()) {
-                ++report.rowsSkipped;
-                continue;
+        CsvReader::forEachRecord(fileInfo.path, [&](const auto& headers, const auto& values) {
+            if (!columnsResolved) {
+                listingIdIndex = columnIndex(headers, "listing_id");
+                dateIndex = columnIndex(headers, "date");
+                availableIndex = columnIndex(headers, "available");
+                priceIndex = columnIndex(headers, "price");
+                columnsResolved = true;
             }
 
-            entries.push_back(std::move(entry));
+            ++report.rowsRead;
+            const long long listingId = toLongLong(valueAt(values, listingIdIndex));
+            const std::string date = valueAt(values, dateIndex);
+            if (listingId == 0 || date.empty()) {
+                ++report.rowsSkipped;
+                return;
+            }
+
+            const std::string availableValue = valueAt(values, availableIndex);
+            const bool available = availableValue == "t" || availableValue == "true";
+            const double price = toDouble(valueAt(values, priceIndex));
+            totalsByListing[listingId] += price > 0.0 ? price : (available ? 1.0 : 0.0);
             ++report.rowsLoaded;
-        }
+        });
     }
 
-    return entries;
+    std::vector<std::pair<long long, double>> orderedTotals(
+        totalsByListing.begin(),
+        totalsByListing.end()
+    );
+    std::sort(orderedTotals.begin(), orderedTotals.end());
+
+    std::vector<double> values;
+    values.reserve(orderedTotals.size());
+    for (const auto& item : orderedTotals) {
+        values.push_back(item.second);
+    }
+    report.groupedListings = values.size();
+    return values;
 }

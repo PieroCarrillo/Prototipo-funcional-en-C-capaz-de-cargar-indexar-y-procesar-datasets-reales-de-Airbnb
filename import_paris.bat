@@ -15,7 +15,7 @@ if not exist "%ZIP%" (
 
 if not exist "%TARGET%" mkdir "%TARGET%"
 
-echo Extrayendo archivos resumidos de Paris...
+echo Extrayendo archivos de Paris...
 tar -xf "%ZIP%" -C "%TARGET%" ^
   Paris/calendar.csv.gz ^
   Paris/listings.csv ^
@@ -28,22 +28,22 @@ if errorlevel 1 (
   exit /b 1
 )
 
-echo Creando muestra de 100000 filas de calendar.csv.gz...
+echo Descomprimiendo el calendario completo...
+echo Este proceso requiere aproximadamente 1.2 GB libres y puede tardar.
 powershell -NoProfile -ExecutionPolicy Bypass ^
-  -File "scripts\extract_gzip_sample.ps1" ^
+  -File "scripts\extract_gzip_csv.ps1" ^
   -InputPath "%TARGET%\Paris\calendar.csv.gz" ^
-  -OutputPath "%TARGET%\Paris\calendar.csv" ^
-  -MaxDataRows 100000 ^
-  -RequiredToken ",t,"
+  -OutputPath "%TARGET%\Paris\calendar.csv"
 
 if errorlevel 1 (
-  echo Error al crear la muestra de calendario.
+  echo Error al descomprimir el calendario.
   exit /b 1
 )
 
 del "%TARGET%\Paris\calendar.csv.gz"
+> "%TARGET%\Paris\.full-dataset-ready" echo Paris completo
 
 echo.
 echo Dataset disponible en data\real\Paris
-echo Se creo calendar.csv con una muestra real de 100000 filas.
-echo Los archivos detallados restantes permanecen dentro del ZIP.
+echo calendar.csv contiene todos los registros entregados por el profesor.
+echo Los archivos comprimidos detallados restantes permanecen dentro del ZIP.

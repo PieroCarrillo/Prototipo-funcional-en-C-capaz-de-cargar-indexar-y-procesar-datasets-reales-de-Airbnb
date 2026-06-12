@@ -53,6 +53,23 @@ g++ -std=c++17 -O2 -Iinclude src/*.cpp -o build/airbnb_indexer
 
 En Windows, el ejecutable puede quedar como `build/airbnb_indexer.exe`.
 
+## Menu interactivo
+
+La aplicacion presenta un menu de consola alineado con los modulos del
+documento:
+
+| Opcion | Contenido |
+| --- | --- |
+| M1 | Recorrido recursivo, clasificacion de archivos y resumen de carga |
+| M2 | Construccion y metricas de los indices en memoria |
+| M3 | Busqueda exacta y parcial, filtros, ordenamientos, ranking y exportacion |
+| M4 | Caminos minimos, MST, DFS y Tarjan |
+| M5 | Consultas por rangos y calendario dinamico |
+
+Los listings y sus indices se preparan una sola vez al iniciar. El calendario
+se carga bajo demanda al seleccionar M5, porque el archivo completo es
+considerablemente mas grande.
+
 ## Ejecucion rapida
 
 En Windows, desde VS Code, PowerShell o CMD:
@@ -61,7 +78,8 @@ En Windows, desde VS Code, PowerShell o CMD:
 .\run.bat
 ```
 
-Ese archivo compila y ejecuta el prototipo usando `C:\msys64\mingw64\bin\g++.exe`.
+Ese archivo compila y abre el menu usando
+`C:\msys64\mingw64\bin\g++.exe`.
 
 En VS Code tambien puedes presionar `Ctrl+Shift+B` y elegir `Compilar y ejecutar Airbnb`.
 
@@ -119,16 +137,22 @@ Para compilar y ejecutar directamente con Paris:
 ```
 
 Los datos se extraen en `data/real/Paris`, carpeta excluida de Git para evitar
-subir cientos de megabytes al repositorio. El programa carga todos los
-listings, pero limita el grafo a una muestra configurable porque
-Floyd-Warshall tiene complejidad O(V^3). Durante la importacion tambien se
-genera un `calendar.csv` con las primeras 100,000 filas reales del archivo
-comprimido que se encuentran disponibles (`available=t`), suficiente para
-validar Segment Tree lazy, Fenwick y AVL sin
-descomprimir los mas de 30 millones de registros completos. En la entrega de
-Paris, `price` y `adjusted_price` estan vacios en todo el calendario; por ello
-el modulo dinamico usa precio cuando existe y disponibilidad binaria cuando
-el precio no fue publicado.
+subir cientos de megabytes al repositorio. La importacion descomprime los
+30,100,525 registros de `calendar.csv`; se recomienda disponer de al menos
+1.2 GB libres.
+
+M5 recorre el calendario completo mediante streaming y acumula cada registro
+por `listing_id`. De esta manera todos los registros son procesados, mientras
+Segment Tree, Fenwick y AVL trabajan sobre una serie compacta por alojamiento.
+En la entrega de Paris, `price` y `adjusted_price` estan vacios en el
+calendario; por ello se acumula disponibilidad binaria: disponible = 1 y no
+disponible = 0.
+
+M4 usa todos los listings para formar los centroides de barrios. Los algoritmos
+de caminos minimos sobre alojamientos mantienen el limite configurable
+`--graph-limit`, porque Floyd-Warshall requiere O(V^3) operaciones y O(V^2)
+memoria; ejecutarlo con 82,467 nodos no es viable. El menu aplica un maximo de
+500 nodos y usa 100 de forma predeterminada.
 
 ## Uso con datasets reales
 
@@ -165,18 +189,13 @@ Luego ejecutar:
 
 ## Resultado esperado
 
-El programa imprime:
+Desde el menu se puede consultar:
 
-- Archivos CSV encontrados por recorrido recursivo.
-- Cantidad de listings cargados y filas omitidas.
-- Tiempo de carga e indexacion.
-- Estimacion aproximada de memoria usada por los indices.
-- Resultado de busqueda exacta por ID.
-- Resultados de busqueda parcial.
-- Resultados filtrados por rango de precio.
-- Rankings ordenados por precio y por puntaje.
-- Resultados M4 de grafos: caminos minimos, MST, DFS y Tarjan.
-- Resultados M5 de rangos: Segment Tree, Fenwick, busqueda binaria y actualizaciones dinamicas de calendario.
+- M1: archivos encontrados, filas cargadas y tiempo de lectura.
+- M2: indices construidos, tiempo y memoria estimada.
+- M3: busquedas, filtros, ordenamientos, ranking y exportacion.
+- M4: caminos minimos, MST, DFS y Tarjan.
+- M5: Segment Tree, Fenwick, busqueda binaria, AVL y calendario completo.
 
 La validacion con la coleccion real del profesor esta documentada en
 `docs/RESULTADOS_PARIS.md`.

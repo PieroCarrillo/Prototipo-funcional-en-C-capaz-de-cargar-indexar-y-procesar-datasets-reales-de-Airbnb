@@ -353,19 +353,17 @@ std::vector<RangeMetric> RangeAnalytics::comparePriceRange(
     return metrics;
 }
 
-CalendarSimulationResult RangeAnalytics::simulateCalendarUpdates(const std::vector<CalendarEntry>& entries) {
+CalendarSimulationResult RangeAnalytics::simulateCalendarUpdates(
+    const std::vector<double>& values,
+    std::size_t sourceRows
+) {
     // Se aplica la misma actualizacion puntual de +2 al primer precio. La suma
     // final debe coincidir en las tres estructuras dinamicas.
     CalendarSimulationResult result;
-    result.entries = entries.size();
-    if (entries.empty()) {
+    result.sourceRows = sourceRows;
+    result.aggregatedValues = values.size();
+    if (values.empty()) {
         return result;
-    }
-
-    std::vector<double> values;
-    values.reserve(entries.size());
-    for (const CalendarEntry& entry : entries) {
-        values.push_back(entry.price > 0.0 ? entry.price : (entry.available ? 1.0 : 0.0));
     }
 
     const std::size_t left = 0;

@@ -106,8 +106,13 @@ Resultado esperado:
 
 - Carga exactamente 82,467 listings sin omitir filas.
 - Reconoce 20 barrios.
-- Carga una muestra de 100,000 registros reales de calendario.
+- Presenta el menu principal separado en M1, M2, M3, M4 y M5.
+- M5 recorre los 30,100,525 registros reales de calendario.
+- Informa la cantidad de valores agregados por alojamiento.
 - Muestra precios faltantes como `N/D`.
 - Dijkstra, Bellman-Ford y Floyd-Warshall alcanzan los 100 nodos de la muestra.
 - Kruskal, Prim y Boruvka obtienen el mismo costo MST.
 - Segment Tree, Fenwick Tree y busqueda binaria obtienen 18,082 coincidencias.
+
+La ejecucion completa del calendario debe realizarse localmente desde M5,
+opcion 2, debido al tiempo y al tamano del archivo descomprimido.

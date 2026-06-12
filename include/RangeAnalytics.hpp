@@ -18,7 +18,8 @@ struct RangeMetric {
 
 /// Resultado de simular actualizaciones sobre registros de calendario.
 struct CalendarSimulationResult {
-    std::size_t entries = 0;
+    std::size_t sourceRows = 0;
+    std::size_t aggregatedValues = 0;
     double segmentTreeLazyMs = 0.0;
     double fenwickPointUpdateMs = 0.0;
     double avlUpdateQueryMs = 0.0;
@@ -52,5 +53,8 @@ public:
      * cuando esta disponible; de lo contrario se representa disponibilidad
      * como 1 y no disponibilidad como 0.
      */
-    static CalendarSimulationResult simulateCalendarUpdates(const std::vector<CalendarEntry>& entries);
+    static CalendarSimulationResult simulateCalendarUpdates(
+        const std::vector<double>& values,
+        std::size_t sourceRows
+    );
 };

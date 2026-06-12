@@ -24,14 +24,14 @@ Desarrollar un prototipo algoritimico inicial que demuestre la viabilidad tecnic
 ## 4. Arquitectura del prototipo
 
 ```text
-Usuario CLI
+Usuario - Menu interactivo M1 a M5
    |
    v
 main.cpp
    |
    +-- DirectoryScanner: recorrido recursivo e identificacion de CSV
-   +-- DataLoader: lectura de listings desde CSV
-   +-- CsvReader: parseo de lineas CSV con comillas
+   +-- DataLoader: lectura de listings y agregacion completa de calendario
+   +-- CsvReader: parseo normal y streaming de CSV masivos
    +-- AirbnbIndex: indices en memoria y consultas
    +-- GraphAnalytics: caminos minimos, MST y recorridos
    +-- RangeAnalytics: estructuras de rango y calendario dinamico
@@ -63,15 +63,16 @@ Casos cubiertos:
 
 | Caso | Entrada | Resultado esperado |
 | --- | --- | --- |
-| Busqueda exacta | `--id 1001` | Devuelve el departamento cerca a la playa en Miraflores. |
-| Busqueda parcial | `--query playa` | Devuelve alojamientos cuyo nombre o zona contiene el token buscado. |
-| Filtro por precio | `--min-price 40 --max-price 120` | Devuelve alojamientos dentro del rango indicado. |
-| Ordenamiento | `--top 5` | Muestra los alojamientos mas baratos y el ranking por score. |
-| Recorrido recursivo | `--data data/pilot` | Encuentra CSV dentro de `lima/` y `cusco/`. |
-| Caminos minimos | ejecucion normal | Reporta Dijkstra, Bellman-Ford y Floyd-Warshall sobre grafo de listings. |
-| MST y Tarjan | ejecucion normal | Reporta Kruskal, Prim, Boruvka, DFS y puntos de articulacion. |
-| Rangos avanzados | ejecucion normal | Compara Segment Tree, Fenwick Tree y busqueda binaria. |
-| Calendario dinamico | ejecucion normal | Compara Segment Tree lazy, Fenwick puntual y AVL. |
+| Busqueda exacta | M3, opcion 1 | Devuelve el alojamiento solicitado por ID. |
+| Busqueda parcial | M3, opcion 2 | Devuelve alojamientos cuyo nombre o zona contiene el texto. |
+| Filtro por precio | M3, opcion 3 | Devuelve alojamientos dentro del rango indicado. |
+| Ordenamiento | M3, opciones 4 a 6 | Muestra ordenamientos y ranking por score. |
+| Recorrido recursivo | M1 | Encuentra y clasifica los CSV bajo la carpeta elegida. |
+| Construccion de indices | M2 | Reporta estructuras, tiempo y memoria estimada. |
+| Caminos minimos | M4 | Reporta Dijkstra, Bellman-Ford y Floyd-Warshall. |
+| MST y Tarjan | M4 | Reporta Kruskal, Prim, Boruvka, DFS y articulaciones. |
+| Rangos avanzados | M5, opcion 1 | Compara Segment Tree, Fenwick Tree y busqueda binaria. |
+| Calendario dinamico | M5, opcion 2 | Recorre calendar completo y compara las estructuras dinamicas. |
 
 ## 7. Metricas preliminares
 
@@ -94,7 +95,8 @@ Los resultados esperados sobre la coleccion piloto se documentan en `docs/RESULT
 ## 8. Limitaciones actuales
 
 - La coleccion incluida es piloto y pequena para facilitar revision del codigo.
-- Se cargan principalmente archivos `listings.csv`; `calendar.csv` ya se usa para simulacion dinamica y `reviews.csv` queda como base para integracion textual posterior.
+- Se cargan `listings.csv` y todos los registros de `calendar.csv`;
+  `reviews.csv` queda como base para integracion textual posterior.
 - La normalizacion textual es basica y no elimina tildes; esto puede mejorarse en el informe final.
 - La estimacion de memoria es aproximada porque las estructuras STL gestionan capacidad interna dependiente del compilador.
 - Los grafos se generan desde coordenadas y centroides piloto; con datasets reales puede reemplazarse por vecindad GeoJSON exacta.

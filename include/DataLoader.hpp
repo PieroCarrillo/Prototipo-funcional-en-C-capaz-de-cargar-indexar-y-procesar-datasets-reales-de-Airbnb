@@ -7,15 +7,6 @@
 #include <string>
 #include <vector>
 
-/// Registro diario de precio y disponibilidad de un alojamiento.
-struct CalendarEntry {
-    long long listingId = 0;
-    std::string date;
-    bool available = false;
-    double price = 0.0;
-    std::string sourceFile;
-};
-
 /// Estadisticas producidas durante la carga de archivos listings.
 struct LoadReport {
     std::vector<CsvFileInfo> csvFiles;
@@ -32,6 +23,7 @@ struct CalendarReport {
     std::size_t rowsRead = 0;
     std::size_t rowsLoaded = 0;
     std::size_t rowsSkipped = 0;
+    std::size_t groupedListings = 0;
 };
 
 /**
@@ -45,6 +37,14 @@ public:
     /// Carga todos los archivos listings encontrados bajo la carpeta raiz.
     static std::vector<Listing> loadListings(const std::filesystem::path& root, LoadReport& report);
 
-    /// Carga todos los archivos calendar encontrados bajo la carpeta raiz.
-    static std::vector<CalendarEntry> loadCalendar(const std::filesystem::path& root, CalendarReport& report);
+    /**
+     * @brief Procesa todo calendar.csv y agrega sus valores por alojamiento.
+     *
+     * Cada fila valida se lee mediante streaming. El precio diario se usa
+     * cuando existe; en caso contrario se acumula disponibilidad como 1 o 0.
+     */
+    static std::vector<double> loadCalendarAggregates(
+        const std::filesystem::path& root,
+        CalendarReport& report
+    );
 };

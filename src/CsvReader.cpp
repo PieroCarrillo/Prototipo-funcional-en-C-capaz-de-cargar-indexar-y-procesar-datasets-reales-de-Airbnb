@@ -76,9 +76,7 @@ std::vector<std::string> CsvReader::parseLine(const std::string& line) {
     return values;
 }
 
-// La primera fila define los nombres de columna. Las filas posteriores se
-// convierten en mapas para que otros modulos consulten campos por nombre.
-std::vector<CsvReader::Row> CsvReader::read(const std::filesystem::path& filePath) {
+void CsvReader::forEachRecord(const std::filesystem::path& filePath, const RecordCallback& callback) {
     std::ifstream input(filePath);
     if (!input) {
         throw std::runtime_error("No se pudo abrir el archivo CSV: " + filePath.string());
@@ -86,7 +84,7 @@ std::vector<CsvReader::Row> CsvReader::read(const std::filesystem::path& filePat
 
     std::vector<std::string> headers;
     if (!readRecord(input, headers)) {
-        return {};
+        return;
     }
     if (!headers.empty() && headers.front().size() >= 3 &&
         static_cast<unsigned char>(headers.front()[0]) == 0xEF &&
@@ -95,19 +93,26 @@ std::vector<CsvReader::Row> CsvReader::read(const std::filesystem::path& filePat
         headers.front().erase(0, 3);
     }
 
-    std::vector<Row> rows;
     std::vector<std::string> values;
     while (readRecord(input, values)) {
         if (values.size() == 1 && values.front().empty()) {
             continue;
         }
+        callback(headers, values);
+    }
+}
 
+// La primera fila define los nombres de columna. Las filas posteriores se
+// convierten en mapas para que otros modulos consulten campos por nombre.
+std::vector<CsvReader::Row> CsvReader::read(const std::filesystem::path& filePath) {
+    std::vector<Row> rows;
+    forEachRecord(filePath, [&](const auto& headers, const auto& values) {
         Row row;
         for (std::size_t i = 0; i < headers.size(); ++i) {
             row[headers[i]] = i < values.size() ? values[i] : "";
         }
         rows.push_back(std::move(row));
-    }
+    });
 
     return rows;
 }

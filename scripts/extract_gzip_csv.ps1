@@ -5,9 +5,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$OutputPath,
 
-    [int]$MaxDataRows = 100000,
-
-    [string]$RequiredToken = ""
+    [long]$MaxDataRows = 0
 )
 
 $inputStream = $null
@@ -37,22 +35,22 @@ try {
     }
     $writer.WriteLine($header)
 
-    $rows = 0
-    $scanned = 0
-    while ($rows -lt $MaxDataRows) {
+    [long]$rows = 0
+    while ($MaxDataRows -le 0 -or $rows -lt $MaxDataRows) {
         $line = $reader.ReadLine()
         if ($null -eq $line) {
             break
         }
-        $scanned++
-        if ($RequiredToken -ne "" -and -not $line.Contains($RequiredToken)) {
-            continue
-        }
+
         $writer.WriteLine($line)
         $rows++
+
+        if ($rows % 1000000 -eq 0) {
+            Write-Host "  Filas descomprimidas: $rows"
+        }
     }
 
-    Write-Host "Muestra creada: $rows filas seleccionadas de $scanned revisadas en $OutputPath"
+    Write-Host "Archivo creado con $rows filas de datos: $OutputPath"
 }
 finally {
     if ($null -ne $writer) { $writer.Dispose() }
